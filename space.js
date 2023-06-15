@@ -215,6 +215,7 @@ class Invader {
     }}
 
     shoot(InvaderProjectiles){
+        audio.enemyShoot.play()
         InvaderProjectiles.push(new InvaderProjectile({
             position: {
                 x: this.position.x + this.width / 2,
@@ -304,6 +305,7 @@ class Bomb {
         {this.velocity.y = -this.velocity.y}  
     }
     explode() {
+        audio.bomb.play()
         this.active = true
         this.velocity.x = 0
         this.velocity.y = 0
@@ -375,6 +377,7 @@ let game = {
 
 let score = 0
 function init() {
+    audio.backgroundMusic.play()
     player = new Player()
     projectiles = []
     grids= []
@@ -462,7 +465,7 @@ function createScoreLabels({score = 420, object}) {
 function endGame(){
     //Makes player dissapear
     setTimeout(() => {
-
+        audio.gameOver.play()
         player.opacity = 0
         game.over = true
    }, 0)
@@ -472,9 +475,9 @@ function endGame(){
        game.active = false
        document.querySelector('#restartScreen').style.display = 'flex'
        document.querySelector('#scoreContainer').style.display = 'none'
+       audio.backgroundMusic.stop()
        
-  }, 1500)
-
+  }, 2000)
    createParticles({
        object: player,
        color: 'red',
@@ -575,6 +578,7 @@ function animate(){
         if( rectangularCollision({rectangle1:invaderProjectile,
                                   rectangle2: player})
             ) { 
+            audio.explode.play()
             invaderProjectiles.splice(index, 1)
             endGame()
         }
@@ -600,7 +604,7 @@ function animate(){
             projectiles.splice(i,1)
             powerUps.splice(j,1)
             player.powerUp = 'MachineGun'
-            
+            audio.bonus.play()
             setTimeout(() => {
                 player.powerUp = null
                 
@@ -666,7 +670,6 @@ function animate(){
                         const projectileFound = projectiles.find(
                             (projectile2) => projectile2 === projectile
                         )
-
                         //remove invader and projectile
                         if(invaderFound && projectileFound){
                             score +=420
@@ -680,7 +683,8 @@ function animate(){
                             object: invader,
                             fades:true
                          })
-        
+                        // singular projectile hit enemy
+                        audio.explode.play()
                         grid.invaders.splice(i,1)
                         projectiles.splice(j,1)
 
@@ -700,7 +704,7 @@ function animate(){
             //remove player if invaders touch it
             if( rectangularCollision({rectangle1:invader,
             rectangle2: player
-            }) && game.over
+            }) && game.over && audio.explode.play()
             ) 
             endGame()
         
@@ -732,7 +736,8 @@ function animate(){
     }
 
      
-    if(keys.space.pressed && player.powerUp === 'MachineGun' && frames % 2 === 0)
+    if(keys.space.pressed && player.powerUp === 'MachineGun' && frames % 2 === 0) { 
+    if(frames % 6 === 0) audio.shoot.play()
     projectiles.push(
         new Projectiles({
             position:{
@@ -746,12 +751,15 @@ function animate(){
             color: 'yellowgreen'
         })
      )
-
+    }
     
     frames++
+    
 }
 
 document.querySelector('#startButton').addEventListener('click' , () => {
+
+audio.start.play()
 document.querySelector('#background').style.display = 'none'
 document.querySelector('#scoreContainer').style.display = 'flex'
     init()
@@ -760,6 +768,8 @@ document.querySelector('#scoreContainer').style.display = 'flex'
 document.querySelector('#restartButton').addEventListener('click' , () => {
     score = 0
     scoreEl.textContent = score
+    
+    audio.select.play()
 document.querySelector('#restartScreen').style.display = 'none'
 document.querySelector('#scoreContainer').style.display = 'flex'
     init()
@@ -784,6 +794,7 @@ addEventListener('keydown', ({key}) => {
          //console.log('space')
          keys.space.pressed = true
          if(player.powerUp === 'MachineGun') return
+         audio.shoot.play()
          projectiles.push(
             new Projectiles({
                 position:{
