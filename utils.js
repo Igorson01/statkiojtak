@@ -35,6 +35,7 @@ function endGame(){
    setTimeout(() => {
        game.active = false
        document.querySelector('#restartScreen').style.display = 'flex'
+       document.querySelector('#finalScore').innerHTML = score
        document.querySelector('#scoreContainer').style.display = 'none'
        audio.backgroundMusic.stop()
        
